@@ -1,10 +1,19 @@
 <?php
+/**
+ * Twispay Language Configurator
+ *
+ * Twispay general language handler for admin pannel
+ *
+ * @package  Twispay/Language
+ * @version  1.0.1
+ */
 
-$baseurl = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
-$baseurl .= $_SERVER['HTTP_HOST'];
-$_['heading_title'] = 'Twispay';
+// $baseurl = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
+// $baseurl .= $_SERVER['HTTP_HOST'];
+// $baseurl .'/modules/gateways/callback/twispay_validate.php';
+
+$_['heading_title'] = 'Twispay Payment Method Configuration';
 $_['text_twispay']	  = '<a href="//twispay.com/" target="_blank"><img src="view/image/payment/twispay_logo.png" alt="Twispay" title="Twispay" style="border: 1px solid #EEEEEE;height: 70%; width: auto; padding: 2px 8px;" /></a>';
-
 
 // Text
 $_['text_extension']     = 'Extensions';
@@ -31,7 +40,7 @@ $_['desc_live_site_key'] = 'Enter site secret key here';
 $_['desc_staging_site_id'] = 'Enter your staging account ID here';
 $_['desc_staging_site_key'] = 'Enter staging secret key here';
 $_['desc_s_t_s_notification'] = 'Put this URL in your Twispay account';
-//$baseurl .'/modules/gateways/callback/twispay_validate.php';
+
 $_['desc_redirect_page'] = 'Leave empty to redirect to order confirmation default page';
 
 $_['text_testMode'] = 'Test Mode';
@@ -41,8 +50,6 @@ $_['text_staging_site_id'] = 'Staging Account ID';
 $_['text_staging_site_key'] = 'Staging Secret Key';
 $_['text_s_t_s_notification'] = 'Server-to-server notification URL';
 $_['text_redirect_page'] = 'Redirect to custom page: <br/>Ex: <font color="#6495ed">/index.php?route=checkout/cart</font>';
-
-
 
 
 // Error

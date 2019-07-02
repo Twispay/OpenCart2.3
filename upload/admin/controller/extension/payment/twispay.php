@@ -7,10 +7,11 @@ class ControllerExtensionPaymentTwispay extends Controller {
         $this->baseurl .= $_SERVER['HTTP_HOST'];
 
         $this->load->language('extension/payment/twispay');
-        $this->document->setTitle('Twispay Payment Method Configuration');
+        $this->document->setTitle($this->language->get('heading_title'));
+
         $this->load->model('setting/setting');
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-		//if (($this->request->server['REQUEST_METHOD'] == 'POST')) {
+		        //if (($this->request->server['REQUEST_METHOD'] == 'POST')) {
 
             $this->model_setting_setting->editSetting('twispay', $this->request->post);
             $this->session->data['success'] = 'Saved.';
@@ -47,7 +48,7 @@ class ControllerExtensionPaymentTwispay extends Controller {
         $data['button_save'] = $this->language->get('text_button_save');
         $data['button_cancel'] = $this->language->get('text_button_cancel');
 
-
+        $data['text_edit'] = $this->language->get('text_edit');
         $data['text_testMode'] = $this->language->get('text_testMode');
         $data['text_live_site_id'] = $this->language->get('text_live_site_id');
         $data['text_live_site_key'] = $this->language->get('text_live_site_key');
@@ -75,13 +76,9 @@ class ControllerExtensionPaymentTwispay extends Controller {
 
         $data['action'] = $this->url->link('extension/payment/twispay', 'token=' . $this->session->data['token'], true);
         //$data['cancel'] = $this->url->link('marketplace/extension', 'token=' . $this->session->data['token'] . '&type=payment', true);
-		$data['cancel'] = $this->url->link('extension/extension', 'token=' . $this->session->data['token'] . '&type=payment', true);
+		    $data['cancel'] = $this->url->link('extension/extension', 'token=' . $this->session->data['token'] . '&type=payment', true);
 
-
-
-
-		
-		$data['twispay_testMode'] = (isset($this->request->post['twispay_testMode'])) ? $this->request->post['twispay_testMode'] : $this->config->get('twispay_testMode');
+		    $data['twispay_testMode'] = (isset($this->request->post['twispay_testMode'])) ? $this->request->post['twispay_testMode'] : $this->config->get('twispay_testMode');
         $data['twispay_live_site_id'] = (isset($this->request->post['twispay_live_site_id'])) ? $this->request->post['twispay_live_site_id'] : $this->config->get('twispay_live_site_id');
         $data['twispay_live_site_key'] = (isset($this->request->post['twispay_live_site_key'])) ? $this->request->post['twispay_live_site_key'] : $this->config->get('twispay_live_site_key');
         $data['twispay_staging_site_id'] = (isset($this->request->post['twispay_staging_site_id'])) ? $this->request->post['twispay_staging_site_id'] : $this->config->get('twispay_staging_site_id');
@@ -103,8 +100,8 @@ class ControllerExtensionPaymentTwispay extends Controller {
         $data['column_left'] = $this->load->controller('common/column_left');
         $data['footer'] = $this->load->controller('common/footer');
         $this->response->setOutput($this->load->view('extension/payment/twispay', $data));
-
     }
+
     protected function validate() {
 //        $log_file = $this->config->get('twispay_logs').'/twispay_perm_log.txt';
 //        $p = json_encode($this->permission);
@@ -112,8 +109,6 @@ class ControllerExtensionPaymentTwispay extends Controller {
         if (!$this->user->hasPermission('modify', 'extension/payment/twispay')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
-		
-
         return !$this->error;
     }
 
@@ -121,26 +116,28 @@ class ControllerExtensionPaymentTwispay extends Controller {
     {
         return is_dir($path) || mkdir($path);
     }
+
     private function delTree($dir)
     {
-        $files = array_diff(scandir($dir), array('.', '..'));
+        if(is_dir($dir)){
+          $files = array_diff(scandir($dir), array('.', '..'));
 
-        foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+          foreach ($files as $file) {
+              (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+          }
+          return rmdir($dir);
         }
-
-        return rmdir($dir);
+        return false;
     }
 
     public function twispaylogs(){
-
         $route = $this->request->get;
             $id = str_replace(array('extension/payment/twispay/twispaylogs','/'),'',$route['route']);
             if(empty($id)){
                 $id = 0;
             }
         $this->language->load('extension/payment/twispay');
-        $this->document->setTitle('Twispay Payment Method Configuration');
+        $this->document->setTitle($this->language->get('heading_title'));
         if (isset($this->error['warning'])) {
             $data['error_warning'] = $this->error['warning'];
         } else {
@@ -252,39 +249,26 @@ class ControllerExtensionPaymentTwispay extends Controller {
 
     public function install(){
         $this->uninstall();
-        $path = $_SERVER['DOCUMENT_ROOT'].'/twispay_logs';
+        $path = $_SERVER['DOCUMENT_ROOT'].'/twispay_logs/';
         $this->makeDir($path);
+
         $this->load->model('setting/setting');
         $this->model_setting_setting->editSetting('payment_twispay',array('twispay_testMode' => '1','twispay_logs' => $path));
-        $sql = "
-            CREATE TABLE IF NOT EXISTS `". DB_PREFIX ."twispay_transactions` (
-                `id_transaction` int(11) NOT NULL AUTO_INCREMENT,
-                `status` varchar(16) NOT NULL,
-                `invoice` varchar(30) NOT NULL,
-                `order_id` int(11) NOT NULL,
-                `identifier` int(11) NOT NULL,
-                `customerId` int(11) NOT NULL,
-                `orderId` int(11) NOT NULL,
-                `cardId` int(11) NOT NULL,
-                `transactionId` int(11) NOT NULL,
-                `transactionKind` varchar(16) NOT NULL,
-                `amount` float NOT NULL,
-                `currency` varchar(8) NOT NULL,
-                `date` DATETIME NOT NULL,
-                `refund_date` DATETIME NOT NULL,
-                PRIMARY KEY (`id_transaction`)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
-        $this->db->query($sql);
-        $path = $_SERVER['DOCUMENT_ROOT'].'/twispay_logs';
-        $this->makeDir($path);
 
+        $this->load->model('extension/payment/twispay');
+        $this->model_extension_payment_twispay->createTransationTable();
     }
+
     public function uninstall(){
+        $this->load->model('setting/setting');
+        $this->model_setting_setting->deleteSetting('payment_twispay');
+        // $this->db->query("DELETE FROM `" . DB_PREFIX. "setting` WHERE `code`='payment_twispay'");
+
+        $this->load->model('extension/payment/twispay');
+        $this->model_extension_payment_twispay->deleteTransationTable();
+        // $this->db->query("DROP TABLE IF EXISTS `". DB_PREFIX ."twispay_transactions`");
+
         $path = $_SERVER['DOCUMENT_ROOT'].'/twispay_logs';
         $this->delTree($path);
-        $this->db->query("DELETE FROM `" . DB_PREFIX. "setting` WHERE `code`='payment_twispay'");
-        $this->db->query("DROP TABLE IF EXISTS `". DB_PREFIX ."twispay_transactions`");
-
     }
-
 }

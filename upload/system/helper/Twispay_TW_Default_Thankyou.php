@@ -2,7 +2,7 @@
 /**
  * Twispay Helpers
  *
- * Redirects user to the order page.
+ * Redirects user to the thank you page.
  *
  * @package  Twispay/Front
  * @category Front
@@ -19,7 +19,7 @@ if ( ! class_exists( 'Twispay_TW_Default_Thankyou' ) ) :
      * @version 0.0.1
      *
      *
-     * Class that redirects user to the order page.
+     * Class that redirects user to the thank you page.
      */
     class Twispay_TW_Default_Thankyou {
       /**
@@ -29,14 +29,13 @@ if ( ! class_exists( 'Twispay_TW_Default_Thankyou' ) ) :
        * @return void
        */
       public function __construct( ) {
-        //Page redirect
-        /* Set host url */
-        $base_url = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
-        $base_url .= $_SERVER['HTTP_HOST'];
-        $page_to_redirect = $base_url.'/index.php?route=checkout/success';
-        // echo '<meta http-equiv="refresh" content="1;url='. $page_to_redirect.'" />';
-        // header('Refresh: 1;url=' . $page_to_redirect);
-        print_r('redirect to default: '.$page_to_redirect);
+        /* Get host url */
+        $base_url = HTTPS_SERVER;
+        $page_to_redirect = $base_url.'index.php?route=checkout/success';
+        echo '<meta http-equiv="refresh" content="1;url='. $page_to_redirect.'" />';
+        header('Refresh: 1;url=' . $page_to_redirect);
+        //DEBUG
+        // print_r('redirect to default: '.$page_to_redirect);
       }
     }
 endif; /* End if class_exists. */

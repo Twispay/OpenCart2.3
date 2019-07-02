@@ -22,12 +22,6 @@ if ( !class_exists( 'Twispay_TW_Helper_Response' ) ) :
      * Class that implements methods to decrypt
      * Twispay server responses.
      */
-    /* Require the "Twispay_TW_Logger" class. */
-    // $this->load->helper('Twispay_TW_Logger');
-    require_once('Twispay_TW_Logger.php');
-    /* Require the "Twispay_TW_Status_Updater" class. */
-    require_once('Twispay_TW_Status_Updater.php');
-
     class Twispay_TW_Helper_Response{
         /**
          * Decrypt the response from Twispay server.
@@ -73,12 +67,12 @@ if ( !class_exists( 'Twispay_TW_Helper_Response' ) ) :
          * Function that validates a decripted response.
          *
          * @param tw_response The server decripted and JSON decoded response
-         * @param tw_lang The language that the store uses
+         * @param that Controller instance use for accessing runtime values like configuration, active language, etc.
          *
          * @return bool(FALSE)     - If any error occurs
          *         bool(TRUE)      - If the validation is successful
          */
-        public static function twispay_tw_checkValidation($tw_response, $tw_lang) {
+        public static function twispay_tw_checkValidation($tw_response, $that) {
             $tw_errors = array();
 
             if ( !$tw_response ) {
@@ -86,19 +80,19 @@ if ( !class_exists( 'Twispay_TW_Helper_Response' ) ) :
             }
 
             if ( empty( $tw_response['status'] ) && empty( $tw_response['transactionStatus'] ) ) {
-               $tw_errors[] = $tw_lang->get('log_error_empty_status');
+               $tw_errors[] = $that->language->get('log_error_empty_status');
             }
 
             if ( empty( $tw_response['identifier'] ) ) {
-                $tw_errors[] = $tw_lang->get('log_error_empty_identifier');
+                $tw_errors[] = $that->language->get('log_error_empty_identifier');
             }
 
             if ( empty( $tw_response['externalOrderId'] ) ) {
-                $tw_errors[] = $tw_lang->get('log_error_empty_external');
+                $tw_errors[] = $that->language->get('log_error_empty_external');
             }
 
             if ( empty( $tw_response['transactionId'] ) ) {
-                $tw_errors[] = $tw_lang->get('log_error_empty_transaction');
+                $tw_errors[] = $that->language->get('log_error_empty_transaction');
             }
 
             if ( sizeof( $tw_errors ) ) {
@@ -116,17 +110,17 @@ if ( !class_exists( 'Twispay_TW_Helper_Response' ) ) :
                         , 'customerId'       => (int)$tw_response['customerId']
                         , 'cardId'           => (!empty($tw_response['cardId'])) ? (( int )$tw_response['cardId']) : (0)];
 
-                Twispay_TW_Logger::twispay_tw_log($tw_lang->get('log_ok_response_data') . json_encode($data));
+                Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_response_data') . json_encode($data));
 
                 if ( !in_array($data['status'], Twispay_TW_Status_Updater::$RESULT_STATUSES) ) {
-                    Twispay_TW_Logger::twispay_tw_log($tw_lang->get('log_error_wrong_status') . $data['status']);
-                    Twispay_TW_Logger::twispay_tw_logTransaction( $data );
+                    Twispay_TW_Logger::twispay_tw_log($that->language->get('log_error_wrong_status') . $data['status']);
+                    Twispay_TW_Logger::twispay_tw_logTransaction( $data , $that);
 
                     return FALSE;
                 }
 
-                Twispay_TW_Logger::twispay_tw_logTransaction( $data );
-                Twispay_TW_Logger::twispay_tw_log( $tw_lang->get('log_ok_validating_complete') . $data['id_cart'] );
+                Twispay_TW_Logger::twispay_tw_log( $that->language->get('log_ok_validating_complete') . $data['id_cart'] );
+                Twispay_TW_Logger::twispay_tw_logTransaction( $data, $that );
 
                 return TRUE;
             }
