@@ -5,27 +5,20 @@
  * Updates the statused of orders and subscriptions based
  *  on the status read from the server response.
  *
- * @package  Twispay/Front
- * @category Front
- * @author   @TODO
- * @version  0.0.1
+ * @author   Twistpay
+ * @version  1.0.0
  */
 
 /* Security class check */
-if ( ! class_exists( 'Twispay_TW_Status_Updater' ) ) :
+if (! class_exists('Twispay_TW_Status_Updater')) :
     /**
-     * Twispay Helper Class
-     *
-     * @class   Twispay_TW_Status_Updater
-     * @version 0.0.1
-     *
-     *
      * Class that implements methods to update the statuses
      * of orders and subscriptions based on the status received
      * from the server.
      */
-    require_once('Twispay_TW_Default_Thankyou.php');
-    class Twispay_TW_Status_Updater{
+
+    class Twispay_TW_Status_Updater
+    {
         /* Array containing the possible result statuses. */
         public static $RESULT_STATUSES = [ 'UNCERTAIN' => 'uncertain' /* No response from provider */
                                          , 'IN_PROGRESS' => 'in-progress' /* Authorized */
@@ -38,7 +31,6 @@ if ( ! class_exists( 'Twispay_TW_Status_Updater' ) ) :
                                          , 'THREE_D_PENDING' => '3d-pending' /* Waiting for 3d authentication */
                                          , 'EXPIRING' => 'expiring' /* The recurring order has expired */
                                          ];
-
         /**
          * Update the status of an order according to the received server status.
          *
@@ -48,7 +40,8 @@ if ( ! class_exists( 'Twispay_TW_Status_Updater' ) ) :
          *
          * @return void
          */
-        public static function updateStatus_backUrl($orderId, $decrypted, $that){
+        public static function updateStatus_backUrl($orderId, $decrypted, $that)
+        {
             $that->load->model('extension/payment/twispay');
             /* Extract the order. */
             $order = $that->model_checkout_order->getOrder($orderId);
@@ -70,32 +63,28 @@ if ( ! class_exists( 'Twispay_TW_Status_Updater' ) ) :
                     $that->model_checkout_order->addOrderHistory($orderId, 1/*Pending*/, $that->language->get('a_order_hold_notice'), true);
 
                     Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_status_hold') . $orderId);
-                    Twispay_TW_Notification::notice_to_checkout($that,'',$that->lang('general_error_hold_notice'));
+                    Twispay_TW_Notification::notice_to_checkout($that, '', $that->lang('general_error_hold_notice'));
                 break;
 
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['IN_PROGRESS']:
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['COMPLETE_OK']:
                     /* Create invoice */
                     if (!$order['invoice_no']) {
-                      $invoice = $that->model_extension_payment_twispay->createInvoiceNo($orderId,$order['invoice_prefix']);
+                        $invoice = $that->model_extension_payment_twispay->createInvoiceNo($orderId, $order['invoice_prefix']);
                     }
 
                     /* Mark order as Processing. */
-                    $order_status_id = (!empty($that->config->get('twispay_order_status_id'))) ? $that->config->get('twispay_order_status_id') : 2;
-                    $that->model_checkout_order->addOrderHistory($orderId, $order_status_id /*Twistpay Config Or Processing*/, 'Paid Twispay #'.$decrypted['transactionId'], true);
+                    $that->model_checkout_order->addOrderHistory($orderId, 2/*Processing*/, 'Paid Twispay #'.$decrypted['transactionId'], true);
 
                     Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_status_complete') . $orderId);
 
                     /* Redirect to Twispay "Thank you Page" if it is set, if not, redirect to default "Thank you Page" */
-                    if ( $that->config->get('twispay_redirect_page') != null && strlen($that->config->get('twispay_redirect_page'))) {
-                      $base_url = HTTPS_SERVER;
-                      $page_to_redirect = $base_url.$that->config->get('twispay_redirect_page');
-                      echo '<meta http-equiv="refresh" content="1;url='. $page_to_redirect .'" />';
-                      header('Refresh: 1;url=' . $page_to_redirect);
-                      // DEBUG
-                      // print_r('redirect to custom: '.$page_to_redirect);
+                    if ($that->config->get('twispay_redirect_page') != null && strlen($that->config->get('twispay_redirect_page'))) {
+                        $page_to_redirect = HTTPS_SERVER.$that->config->get('twispay_redirect_page');
+                        echo '<meta http-equiv="refresh" content="1;url='. $page_to_redirect .'" />';
+                        header('Refresh: 1;url=' . $page_to_redirect);
                     } else {
-                        new Twispay_TW_Default_Thankyou();
+                        Twispay_TW_Thankyou::redirect();
                     }
 
                 break;
@@ -111,13 +100,14 @@ if ( ! class_exists( 'Twispay_TW_Status_Updater' ) ) :
          * Update the status of an subscription according to the received server status.
          *
          * @param orderId: The ID of the order to be updated.
-         * @param serverStatus: The status received from server.
+         * @param decrypted: Decrypted order message.
          * @param that: Controller instance use for accessing runtime values like configuration, active language, etc.
          *
          * @return void
          */
 
-        public static function updateStatus_IPN($orderId, $decrypted, $that){
+        public static function updateStatus_IPN($orderId, $decrypted, $that)
+        {
             $that->load->model('extension/payment/twispay');
             /* Extract the order. */
             $order = $that->model_checkout_order->getOrder($orderId);
@@ -133,9 +123,24 @@ if ( ! class_exists( 'Twispay_TW_Status_Updater' ) ) :
                 break;
 
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['CANCEL_OK']:
-                case Twispay_TW_Status_Updater::$RESULT_STATUSES['REFUND_OK']:
+                    /* Mark order as canceled. */
+                    $that->model_checkout_order->addOrderHistory($orderId, 7/*Canceled*/, $that->language->get('a_order_refunded_notice'), true);
+                    Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_status_canceled') . $orderId);
+                break;
+
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['VOID_OK']:
+                    /* Mark order as voided. */
+                    $that->model_checkout_order->addOrderHistory($orderId, 16/*Voided*/, $that->language->get('a_order_refunded_notice'), true);
+                    Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_status_voided') . $orderId);
+                break;
+
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['CHARGE_BACK']:
+                    /* Mark order as refunded. */
+                    $that->model_checkout_order->addOrderHistory($orderId, 13/*Chargeback*/, $that->language->get('a_order_refunded_notice'), true);
+                    Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_status_charged_back') . $orderId);
+                break;
+
+                case Twispay_TW_Status_Updater::$RESULT_STATUSES['REFUND_OK']:
                     /* Mark order as refunded. */
                     $that->model_checkout_order->addOrderHistory($orderId, 11/*Refounded*/, $that->language->get('a_order_refunded_notice'), true);
                     Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_status_refund') . $orderId);
@@ -144,7 +149,6 @@ if ( ! class_exists( 'Twispay_TW_Status_Updater' ) ) :
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['THREE_D_PENDING']:
                     /* Mark order as on-hold. */
                     $that->model_checkout_order->addOrderHistory($orderId, 1/*`Pending`*/, $that->language->get('a_order_hold_notice'), true);
-
                     Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_status_hold') . $orderId);
                 break;
 
