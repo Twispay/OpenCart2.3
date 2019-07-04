@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author   Twistpay
+ * @version  1.0.0
+ */
+
 class ControllerExtensionPaymentTwispay extends Controller
 {
     private static $live_host_name = 'https://secure.twispay.com';

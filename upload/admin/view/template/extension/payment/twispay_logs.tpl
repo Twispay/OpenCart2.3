@@ -1,3 +1,8 @@
+<!--
+ * @author   Twistpay
+ * @version  1.0.0
+-->
+
 <?php echo $header; ?>
 <?php echo $column_left; ?>
 

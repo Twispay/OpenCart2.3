@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @author   Twistpay
+ * @version  1.0.0
+ */
+ 
 class ModelExtensionPaymentTwispay extends Model
 {
     public function getMethod($address, $total)

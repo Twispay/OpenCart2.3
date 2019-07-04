@@ -4,8 +4,8 @@
  *
  * Twispay general language handler for front-store
  *
- * @package  Twispay/Language
- * @version  1.0.1
+ * @author   Twistpay
+ * @version  1.0.0
  */
 
 /* General */

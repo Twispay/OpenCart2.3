@@ -1,4 +1,10 @@
-<?php echo $header; ?><?php echo $column_left; ?>
+<!--
+ * @author   Twistpay
+ * @version  1.0.0
+-->
+
+<?php echo $header; ?>
+<?php echo $column_left; ?>
 
 <div id="content">
   <div class="page-header">

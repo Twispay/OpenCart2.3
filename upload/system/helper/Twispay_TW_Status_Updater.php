@@ -80,11 +80,9 @@ if (! class_exists('Twispay_TW_Status_Updater')) :
 
                     /* Redirect to Twispay "Thank you Page" if it is set, if not, redirect to default "Thank you Page" */
                     if ($that->config->get('twispay_redirect_page') != null && strlen($that->config->get('twispay_redirect_page'))) {
-                        $page_to_redirect = HTTPS_SERVER.$that->config->get('twispay_redirect_page');
-                        echo '<meta http-equiv="refresh" content="1;url='. $page_to_redirect .'" />';
-                        header('Refresh: 1;url=' . $page_to_redirect);
+                        Twispay_TW_Thankyou::twispay($that->config->get('twispay_redirect_page'));
                     } else {
-                        Twispay_TW_Thankyou::redirect();
+                        Twispay_TW_Thankyou::default();
                     }
 
                 break;

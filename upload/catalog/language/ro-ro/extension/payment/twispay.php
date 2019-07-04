@@ -4,14 +4,14 @@
  *
  * Twispay general language handler for front-store
  *
- * @package  Twispay/Language
- * @version  1.0.1
+ * @author   Twistpay
+ * @version  1.0.0
  */
 
 /* General */
 $_['text_title']                    = 'Plătește în siguranță cu cardul | Twispay';
 $_['button_confirm']                = 'Plătește';
-$_['processing']                    = 'Processing ...';
+$_['processing']                    = 'Se procesează ...';
 $_['no_post']                       = '[RESPONSE-ERROR]: lipsa_post';
 
 $_['general_error_title']           = 'S-a petrecut o eroare:';

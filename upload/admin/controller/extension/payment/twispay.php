@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author   Twistpay
+ * @version  1.0.0
+ */
+
 class ControllerExtensionPaymentTwispay extends Controller
 {
     private $error = array();
