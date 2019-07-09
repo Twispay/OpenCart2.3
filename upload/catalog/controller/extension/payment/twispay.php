@@ -115,6 +115,7 @@ class ControllerExtensionPaymentTwispay extends Controller
         $this->load->helper('Twispay_TW_Thankyou');
 
         $this->language->load('extension/payment/twispay');
+        $this->load->model('extension/payment/twispay');
         $this->load->model('checkout/order');
 
         /* Get the Site ID and the Private Key. */
@@ -173,6 +174,17 @@ class ControllerExtensionPaymentTwispay extends Controller
                 exit();
             }
 
+            /* If transaction already exists */
+            $transaction = $this->model_extension_payment_twispay->checktransactions($decrypted['transactionId']);
+            if(empty($transaction)){
+                /* If there is no invoice created */
+                if (!$order['invoice_no']) {
+                    /* Create invoice */
+                    $invoice = $this->model_extension_payment_twispay->createInvoiceNo($decrypted['externalOrderId'],$order['invoice_prefix']);
+                    $decrypted['invoice'] = $invoice;
+                    $this->model_extension_payment_twispay->loggTransaction($decrypted);
+                }
+            }
             Twispay_TW_Status_Updater::updateStatus_backUrl($orderId, $decrypted, $this);
         } else {
             $this->_log($this->lang('no_post'));

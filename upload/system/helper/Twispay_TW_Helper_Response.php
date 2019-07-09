@@ -109,14 +109,10 @@ if (! class_exists('Twispay_TW_Helper_Response')) :
 
                 if (!in_array($data['status'], Twispay_TW_Status_Updater::$RESULT_STATUSES)) {
                     Twispay_TW_Logger::twispay_tw_log($that->language->get('log_error_wrong_status') . $data['status']);
-                    Twispay_TW_Logger::twispay_tw_logTransaction($data, $that);
-
                     return FALSE;
                 }
 
                 Twispay_TW_Logger::twispay_tw_log($that->language->get('log_ok_validating_complete') . $data['id_cart']);
-                Twispay_TW_Logger::twispay_tw_logTransaction($data, $that);
-
                 return TRUE;
             }
         }
