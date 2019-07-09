@@ -3,7 +3,7 @@
  * @author   Twistpay
  * @version  1.0.0
  */
- 
+
 class ModelExtensionPaymentTwispay extends Model
 {
     public function getMethod($address, $total)
@@ -41,7 +41,8 @@ class ModelExtensionPaymentTwispay extends Model
 
     public function checktransactions($_id=0)
     {
-        $data = $this->db->query("SELECT * FROM `".DB_PREFIX."twispay_transactions` WHERE `transactionId`='".$this->db->escape($_id)."'");
+        $db_id = $this->db->escape($_id);
+        $data = $this->db->query("SELECT * FROM `".DB_PREFIX."twispay_transactions` WHERE `transactionId`='".$db_id."'");
         if ($data->num_rows > 0) {
             return TRUE;
         } else {
@@ -49,18 +50,66 @@ class ModelExtensionPaymentTwispay extends Model
         }
     }
 
+
+    public function loggTransaction($data) {
+        $data =json_decode(json_encode($data),TRUE);
+        $data['order_id'] = $data['externalOrderId'];
+        $columns = array(
+            'order_id',
+            'status',
+            'invoice',
+            'identifier',
+            'customerId',
+            'orderId',
+            'cardId',
+            'transactionId',
+            'transactionKind',
+            'amount',
+            'currency',
+            'date',
+        );
+
+        if(!empty($data['timestamp'])) {
+            if(is_array($data['timestamp'])){
+              $data['date'] = date('Y-m-d H:i:s', strtotime($data['timestamp']['date']));
+            } else {
+              $data['date'] = date('Y-m-d H:i:s', $data['timestamp']);
+            }
+            unset($data['timestamp']);
+        }
+
+        if(!empty($data['identifier'])) {
+            $data['identifier'] = (int)str_replace('_', '', $data['identifier']);
+        }
+
+        $query = "INSERT INTO `" . DB_PREFIX . "twispay_transactions` SET ";
+        foreach($data as $key => $value) {
+            if(!in_array($key, $columns)) {
+                unset($data[$key]);
+            } else {
+                $db_value = $this->db->escape($value);
+                $query .= $key."="."'" . $db_value . "',";
+            }
+        }
+
+        $query = rtrim($query,',');
+        $this->db->query($query);
+
+        return $query;
+    }
+
     public function createInvoiceNo($order_id, $prefix)
     {
-        $query = $this->db->query("SELECT MAX(invoice_no) AS invoice_no FROM `" . DB_PREFIX . "order` WHERE invoice_prefix = '" . $this->db->escape($prefix) . "'");
-
+        $db_prefix = $this->db->escape($prefix);
+        $db_order_id = $this->db->escape($order_id);
+        $query = $this->db->query("SELECT MAX(invoice_no) AS invoice_no FROM `" . DB_PREFIX . "order` WHERE invoice_prefix = '" . $db_prefix . "'");
         if ($query->row['invoice_no']) {
             $invoice_no = $query->row['invoice_no'] + 1;
         } else {
             $invoice_no = 1;
         }
+        $this->db->query("UPDATE `" . DB_PREFIX . "order` SET invoice_no = '" . (int)$invoice_no . "', invoice_prefix = '" . $db_prefix . "' WHERE order_id = '" . (int)$db_order_id . "'");
 
-        $this->db->query("UPDATE `" . DB_PREFIX . "order` SET invoice_no = '" . (int)$invoice_no . "', invoice_prefix = '" . $this->db->escape($prefix) . "' WHERE order_id = '" . (int)$order_id . "'");
-
-        return $prefix . $invoice_no;
+        return $db_prefix . $invoice_no;
     }
 }

@@ -68,11 +68,6 @@ if (! class_exists('Twispay_TW_Status_Updater')) :
 
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['IN_PROGRESS']:
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['COMPLETE_OK']:
-                    /* Create invoice */
-                    if (!$order['invoice_no']) {
-                        $invoice = $that->model_extension_payment_twispay->createInvoiceNo($orderId, $order['invoice_prefix']);
-                    }
-
                     /* Mark order as Processing. */
                     $that->model_checkout_order->addOrderHistory($orderId, 2/*Processing*/, 'Paid Twispay #'.$decrypted['transactionId'], true);
 
@@ -84,13 +79,12 @@ if (! class_exists('Twispay_TW_Status_Updater')) :
                     } else {
                         Twispay_TW_Thankyou::default();
                     }
-
                 break;
 
                 default:
                     Twispay_TW_Notification::notice_to_checkout($that);
                     Twispay_TW_Logger::twispay_tw_log($that->language->get('log_error_wrong_status') . $serverStatus);
-                    break;
+                break;
             }
         }
 
