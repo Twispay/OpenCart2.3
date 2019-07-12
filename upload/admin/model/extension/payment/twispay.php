@@ -20,10 +20,10 @@ class ModelExtensionPaymentTwispay extends Model
               `cardId` int(11) NOT NULL,
               `transactionId` int(11) NOT NULL,
               `transactionKind` varchar(16) NOT NULL,
-              `amount` float NOT NULL,
+              `amount` decimal NOT NULL,
               `currency` varchar(8) NOT NULL,
               `date` DATETIME NOT NULL,
-              `refund_date` DATETIME NOT NULL,
+              `refund_date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
               PRIMARY KEY (`id_transaction`)
           ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
         return $this->db->query($sql);
