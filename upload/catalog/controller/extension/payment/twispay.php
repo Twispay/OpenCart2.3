@@ -12,13 +12,45 @@ class ControllerExtensionPaymentTwispay extends Controller
     /*
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////// INDEX /////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+     *
+     * Function that loads the message that needs to be sent to the server via ajax.
+     */
+    public function index(){
+      $this->language->load('extension/payment/twispay');
+      $htmlOutput = "<div id='submit_form_wp'><form><input type='button' value='".$this->lang('button_confirm')."' class='btn btn-primary' id='submit_form_button' /></form></div>
+      <script type='text/javascript'>
+        var $ = jQuery;
+        $(document).on('click', '#submit_form_button', function() {
+          $('#submit_form_wp').css('opacity', '0.5');
+          $('#submit_form_button').val('".$this->lang('button_processing')."');
+          $.ajax({
+            url: '".$this->url->link('extension/payment/twispay/send')."',
+            success: function(data) {
+              $('#submit_form_wp').html(data);
+            },error: function(xhr, ajaxOptions, thrownError) {
+              alert('".$this->lang('ajax_error')."'+thrownError);
+              $('#submit_form_wp').css('opacity', '1');
+              $('#submit_form_button').val('".$this->lang('button_retry')."');
+            }
+          });
+        });
+      </script>";
+      return $htmlOutput;
+    }
+
+    /*
+    ////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////// SEND //////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////
      *
      * Function that populates the message that needs to be sent to the server.
      */
-    public function index()
+    public function send()
     {
         /* Load helpers */
         $this->load->helper('Twispay_TW_Helper_Notify');
@@ -50,9 +82,10 @@ class ControllerExtensionPaymentTwispay extends Controller
                         , 'city' => ($order_info['payment_city']) ? ($order_info['payment_city']) : ($order_info['shipping_city'])
                         , 'zipCode' => ($order_info['payment_postcode']) ? ($order_info['payment_postcode']) : ($order_info['shipping_postcode'])
                         , 'address' => ($order_info['payment_address_1']) ? ($order_info['payment_address_1'].' '.$order_info['payment_address_2']) : ($order_info['shipping_address_1'].' '.$order_info['shipping_address_2'])
-                        , 'phone' => (('+' == $order_info['telephone'][0]) ? ('+') : ('')) . preg_replace('/([^0-9]*)+/', '', $order_info['telephone'])
+                        , 'phone' => ((strlen($order_info['telephone']) && $order_info['telephone'][0] == '+') ? ('+') : ('')) . preg_replace('/([^0-9]*)+/', '', $order_info['telephone'])
                         , 'email' => $order_info['email']
                         ];
+
             /* Get items */
             $products = $this->cart->getProducts();
 
@@ -83,16 +116,18 @@ class ControllerExtensionPaymentTwispay extends Controller
                      , 'backUrl' => $backUrl
                      /* , 'customData' => [] */
             ];
+
             $base64JsonRequest = Twispay_TW_Helper_Notify::getBase64JsonRequest($orderData);
             $base64Checksum = Twispay_TW_Helper_Notify::getBase64Checksum($orderData, $this->secretKey);
 
             $htmlOutput = '<form action="'.$this->hostName.'" method="POST" accept-charset="UTF-8" id="twispay_payment_form">
                 <input type="hidden" name="jsonRequest" value="'.$base64JsonRequest.'">
                 <input type="hidden" name="checksum" value="'.$base64Checksum.'">
-                <input type="submit" value="'.$this->lang('button_confirm').'" class="btn btn-primary" />
-            </form>';
+                <input type="submit" value="'.$this->lang('button_processing').'" class="btn btn-primary" />
+            </form>
+            <script>document.getElementById( "twispay_payment_form" ).submit();</script>';
 
-            return $htmlOutput;
+            echo $htmlOutput;
         }
     }
 
@@ -133,14 +168,14 @@ class ControllerExtensionPaymentTwispay extends Controller
             if (((FALSE == isset($_POST['opensslResult'])) && (FALSE == isset($_POST['result'])))) {
                 $this->_log($this->lang['log_error_empty_response']);
                 Twispay_TW_Notification::notice_to_cart($this);
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             /* Check if there is NO secret key. */
             if ('' == $this->secretKey) {
                 $this->_log($this->lang['log_error_invalid_private']);
                 Twispay_TW_Notification::notice_to_cart($this);
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             /* Extract the server response and decript it. */
@@ -150,7 +185,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             if (FALSE === $decrypted) {
                 $this->_log($this->lang('log_error_decryption_error'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             } else {
                 $this->_log($this->lang('log_ok_string_decrypted'). json_encode($decrypted));
             }
@@ -160,7 +195,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             if (TRUE !== $orderValidation) {
                 $this->_log($this->lang('log_error_validating_failed'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             /* Extract the order. */
@@ -171,7 +206,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             if (FALSE == $order) {
                 $this->_log($this->lang('log_error_invalid_order'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             /* If transaction already exists */
@@ -222,13 +257,13 @@ class ControllerExtensionPaymentTwispay extends Controller
             /* Check if the POST is corrupted: Doesn't contain the 'opensslResult' and the 'result' fields. */
             if (((FALSE == isset($_POST['opensslResult'])) && (FALSE == isset($_POST['result'])))) {
                 $this->_log($this->lang['log_error_empty_response']);
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             /* Check if there is NO secret key. */
             if ('' == $this->secretKey) {
                 $this->_log($this->lang['log_error_invalid_private']);
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             /* Extract the server response and decript it. */
@@ -237,7 +272,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             /* Check if decryption failed.  */
             if (FALSE === $decrypted) {
                 $this->_log($this->lang('log_error_decryption_error'));
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             } else {
                 $this->_log($this->lang('log_ok_string_decrypted'). json_encode($decrypted));
             }
@@ -246,7 +281,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             $orderValidation = Twispay_TW_Helper_Response::twispay_tw_checkValidation($decrypted, $this);
             if (TRUE !== $orderValidation) {
                 $this->_log($this->lang('log_error_validating_failed'));
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             /* Extract the order. */
@@ -256,7 +291,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             /* Check if the order extraction failed. */
             if (FALSE == $order) {
                 $this->_log($this->lang('log_error_invalid_order'));
-                exit();
+                die( $this->lang('twispay_processor_error_general') );
             }
 
             $this->load->model('extension/payment/twispay');
@@ -264,7 +299,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             Twispay_TW_Status_Updater::updateStatus_IPN($orderId, $decrypted, $this);
         } else {
             $this->_log($this->lang('no_post'));
-            exit();
+            die( $this->lang('twispay_processor_error_general') );
         }
     }
 
