@@ -20,20 +20,20 @@ class ControllerExtensionPaymentTwispay extends Controller
      */
     public function index(){
       $this->language->load('extension/payment/twispay');
-      $htmlOutput = "<div id='submit_form_wp'><form><input type='button' value='".$this->lang('button_confirm')."' class='btn btn-primary' id='submit_form_button' /></form></div>
+      $htmlOutput = "<div id='submit_form_wp'><form id='twispay_payment_form'><input data-loading-text='".$this->lang('button_processing')."' type='button' value='".$this->lang('button_confirm')."' class='btn btn-primary' id='submit_form_button' /></form></div>
       <script type='text/javascript'>
         var $ = jQuery;
         $(document).on('click', '#submit_form_button', function() {
-          $('#submit_form_wp').css('opacity', '0.5');
-          $('#submit_form_button').val('".$this->lang('button_processing')."');
+          $('#submit_form_button').button('loading');
           $.ajax({
             url: '".$this->url->link('extension/payment/twispay/send')."',
             success: function(data) {
               $('#submit_form_wp').html(data);
+              $('#submit_form_button').button('loading');
+              $('#twispay_payment_form').submit();
             },error: function(xhr, ajaxOptions, thrownError) {
               alert('".$this->lang('ajax_error')."'+thrownError);
-              $('#submit_form_wp').css('opacity', '1');
-              $('#submit_form_button').val('".$this->lang('button_retry')."');
+              $('#submit_form_button').button('reset');
             }
           });
         });
@@ -94,7 +94,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             foreach ($products as $item) {
                 $items[] = [ 'item' => $item['name']
                            , 'units' =>  $item['quantity']
-                           , 'unitPrice' => number_format(number_format(( float )$item['total'], 2) / number_format(( float )$item['quantity'], 2), 2)
+                           , 'unitPrice' => $this->currency->format($item['price'], $order_info['currency_code'] , false, false)
                            ];
             }
 
@@ -106,7 +106,7 @@ class ControllerExtensionPaymentTwispay extends Controller
                      , 'customer' => $customer
                      , 'order' => [ 'orderId' => (isset($_GET['tw_reload']) && $_GET['tw_reload']) ? ($order_id . '_' . date('YmdHis')) : ($order_id)
                                   , 'type' => 'purchase'
-                                  , 'amount' => $order_info['total']
+                                  , 'amount' =>  $this->currency->format($order_info['total'], $order_info['currency_code'], false, false)
                                   , 'currency' => $order_info['currency_code']
                                   , 'items' => $items
                                   ]
@@ -117,15 +117,16 @@ class ControllerExtensionPaymentTwispay extends Controller
                      /* , 'customData' => [] */
             ];
 
+            $this->_log(json_encode($orderData));
+
             $base64JsonRequest = Twispay_TW_Helper_Notify::getBase64JsonRequest($orderData);
             $base64Checksum = Twispay_TW_Helper_Notify::getBase64Checksum($orderData, $this->secretKey);
 
-            $htmlOutput = '<form action="'.$this->hostName.'" method="POST" accept-charset="UTF-8" id="twispay_payment_form">
-                <input type="hidden" name="jsonRequest" value="'.$base64JsonRequest.'">
-                <input type="hidden" name="checksum" value="'.$base64Checksum.'">
-                <input type="submit" value="'.$this->lang('button_processing').'" class="btn btn-primary" />
-            </form>
-            <script>document.getElementById( "twispay_payment_form" ).submit();</script>';
+            $htmlOutput = "<form action='".$this->hostName."' method='POST' accept-charset='UTF-8' id='twispay_payment_form'>
+                <input type='hidden' name='jsonRequest' value='".$base64JsonRequest."'>
+                <input type='hidden' name='checksum' value='".$base64Checksum."'>
+                <input type='submit' data-loading-text='".$this->lang('button_processing')."' value='".$this->lang("button_retry")."' class='btn btn-primary disabled' disabled='disabled' id='submit_form_button' />
+            </form>";
 
             echo $htmlOutput;
         }
