@@ -11,6 +11,9 @@
 /* General */
 $_['text_title']                    = 'Credit card secure payment| Twispay';
 $_['button_confirm']                = 'Pay now';
+$_['button_processing']             = 'Processing ...';
+$_['button_retry']                  = 'Try again';
+$_['ajax_error']                    = 'Error: ';
 $_['processing']                    = 'Processing ...';
 $_['no_post']                       = '[RESPONSE-ERROR]: no_post';
 

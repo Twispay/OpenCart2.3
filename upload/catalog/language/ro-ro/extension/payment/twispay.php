@@ -11,6 +11,9 @@
 /* General */
 $_['text_title']                    = 'Plătește în siguranță cu cardul | Twispay';
 $_['button_confirm']                = 'Plătește';
+$_['button_processing']             = 'Se procesează ...';
+$_['button_retry']                  = 'Încearcă din nou';
+$_['ajax_error']                    = 'A intervenit o eroare: ';
 $_['processing']                    = 'Se procesează ...';
 $_['no_post']                       = '[RESPONSE-ERROR]: lipsa_post';
 
