@@ -75,7 +75,7 @@ class ControllerExtensionPaymentTwispay extends Controller
 
         if ($order_info) {
             /* Extract the customer details. */
-            $customer = [ 'identifier' => (0 == $order_info['customer_id']) ? ('_' . $order_id . '_' . date('YmdHis')) : ('_' . $order_info['customer_id'])
+            $customer = [ 'identifier' => (0 == $order_info['customer_id']) ? ('_' . $order_id . '_' . date('YmdHis')) : ('_' . $order_info['customer_id'] . '_' . date('YmdHis'))
                         , 'firstName' => ($order_info['payment_firstname']) ? ($order_info['payment_firstname']) : ($order_info['shipping_firstname'])
                         , 'lastName' => ($order_info['payment_lastname']) ? ($order_info['payment_lastname']) : ($order_info['shipping_lastname'])
                         , 'country' => ($order_info['payment_iso_code_2']) ? ($order_info['payment_iso_code_2']) : ($order_info['shipping_iso_code_2'])
@@ -167,16 +167,16 @@ class ControllerExtensionPaymentTwispay extends Controller
 
             /* Check if the POST is corrupted: Doesn't contain the 'opensslResult' and the 'result' fields. */
             if (((FALSE == isset($_POST['opensslResult'])) && (FALSE == isset($_POST['result'])))) {
-                $this->_log($this->lang['log_error_empty_response']);
+                $this->_log($this->lang('log_error_empty_response'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_empty_response') );
             }
 
             /* Check if there is NO secret key. */
             if ('' == $this->secretKey) {
-                $this->_log($this->lang['log_error_invalid_private']);
+                $this->_log($this->lang('log_error_invalid_private'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_invalid_private') );
             }
 
             /* Extract the server response and decript it. */
@@ -186,7 +186,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             if (FALSE === $decrypted) {
                 $this->_log($this->lang('log_error_decryption_error'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_decryption_error') );
             } else {
                 $this->_log($this->lang('log_ok_string_decrypted'). json_encode($decrypted));
             }
@@ -196,7 +196,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             if (TRUE !== $orderValidation) {
                 $this->_log($this->lang('log_error_validating_failed'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_validating_failed') );
             }
 
             /* Extract the order. */
@@ -207,7 +207,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             if (FALSE == $order) {
                 $this->_log($this->lang('log_error_invalid_order'));
                 Twispay_TW_Notification::notice_to_cart($this);
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_invalid_order') );
             }
 
             /* If transaction already exists */
@@ -257,14 +257,14 @@ class ControllerExtensionPaymentTwispay extends Controller
         if (!empty($_POST)) {
             /* Check if the POST is corrupted: Doesn't contain the 'opensslResult' and the 'result' fields. */
             if (((FALSE == isset($_POST['opensslResult'])) && (FALSE == isset($_POST['result'])))) {
-                $this->_log($this->lang['log_error_empty_response']);
-                die( $this->lang('twispay_processor_error_general') );
+                $this->_log($this->lang('log_error_empty_response'));
+                die( $this->lang('log_error_empty_response') );
             }
 
             /* Check if there is NO secret key. */
             if ('' == $this->secretKey) {
-                $this->_log($this->lang['log_error_invalid_private']);
-                die( $this->lang('twispay_processor_error_general') );
+                $this->_log($this->lang('log_error_invalid_private'));
+                die( $this->lang('log_error_invalid_private') );
             }
 
             /* Extract the server response and decript it. */
@@ -273,7 +273,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             /* Check if decryption failed.  */
             if (FALSE === $decrypted) {
                 $this->_log($this->lang('log_error_decryption_error'));
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_decryption_error') );
             } else {
                 $this->_log($this->lang('log_ok_string_decrypted'). json_encode($decrypted));
             }
@@ -282,7 +282,7 @@ class ControllerExtensionPaymentTwispay extends Controller
             $orderValidation = Twispay_TW_Helper_Response::twispay_tw_checkValidation($decrypted, $this);
             if (TRUE !== $orderValidation) {
                 $this->_log($this->lang('log_error_validating_failed'));
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_validating_failed') );
             }
 
             /* Extract the order. */
@@ -292,15 +292,16 @@ class ControllerExtensionPaymentTwispay extends Controller
             /* Check if the order extraction failed. */
             if (FALSE == $order) {
                 $this->_log($this->lang('log_error_invalid_order'));
-                die( $this->lang('twispay_processor_error_general') );
+                die( $this->lang('log_error_invalid_order') );
             }
 
             $this->load->model('extension/payment/twispay');
 
             Twispay_TW_Status_Updater::updateStatus_IPN($orderId, $decrypted, $this);
+            die('OK');
         } else {
             $this->_log($this->lang('no_post'));
-            die( $this->lang('twispay_processor_error_general') );
+            die( $this->lang('no_post') );
         }
     }
 
