@@ -75,9 +75,9 @@ if (! class_exists('Twispay_TW_Status_Updater')) :
 
                     /* Redirect to Twispay "Thank you Page" if it is set, if not, redirect to default "Thank you Page" */
                     if ($that->config->get('twispay_redirect_page') != null && strlen($that->config->get('twispay_redirect_page'))) {
-                        Twispay_TW_Thankyou::twispay($that->config->get('twispay_redirect_page'));
+                        Twispay_TW_Thankyou::custom_page($that->config->get('twispay_redirect_page'));
                     } else {
-                        Twispay_TW_Thankyou::default();
+                        Twispay_TW_Thankyou::default_page();
                     }
                 break;
 

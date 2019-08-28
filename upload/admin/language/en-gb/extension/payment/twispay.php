@@ -46,7 +46,7 @@ $_['text_live_site_key']      = 'Live Secret Key';
 $_['text_staging_site_id']    = 'Staging Account ID';
 $_['text_staging_site_key']   = 'Staging Secret Key';
 $_['text_s_t_s_notification'] = 'Server-to-server notification URL';
-$_['text_redirect_page']      = 'Redirect to custom page: <br/>Ex: <font color="#6495ed">/index.php?route=checkout/cart</font>';
+$_['text_redirect_page']      = 'Redirect to custom page: <br/>Ex: <font color="#6495ed">index.php?route=checkout/cart</font>';
 
 // Error
 $_['error_permission']        = 'Warning: You do not have permission to modify payment Twispay!';
