@@ -20,9 +20,9 @@ if (! class_exists('Twispay_TW_Thankyou')) :
           *
           * @return void
           */
-         public static function default()
+         public static function default_page()
          {
-             Twispay_TW_Thankyou::twispay('index.php?route=checkout/success');
+             Twispay_TW_Thankyou::custom_page('index.php?route=checkout/success');
          }
 
          /**
@@ -32,7 +32,7 @@ if (! class_exists('Twispay_TW_Thankyou')) :
           *
           * @return void
           */
-         public static function twispay($page)
+         public static function custom_page($page)
          {
             $page_to_redirect = HTTPS_SERVER.$page;
             echo '<meta http-equiv="refresh" content="1;url='. $page_to_redirect .'" />';
