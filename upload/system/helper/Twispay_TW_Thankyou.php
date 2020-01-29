@@ -5,7 +5,7 @@
  * Redirects user to the thank you page.
  *
  * @author   Twistpay
- * @version  1.0.0
+ * @version  1.0.1
  */
 
 /* Security class check */
@@ -28,7 +28,7 @@ if (! class_exists('Twispay_TW_Thankyou')) :
          /**
           * Redirect to custom page
           *
-          * @param $page: custom page url - Ex: /index.php?route=checkout/cart.
+          * @param $page: custom page url - Ex: index.php?route=checkout/cart.
           *
           * @return void
           */
