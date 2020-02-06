@@ -1,7 +1,7 @@
 <?php
 /**
  * @author   Twistpay
- * @version  1.0.0
+ * @version  1.0.1
  */
 
 class ModelExtensionPaymentTwispay extends Model
@@ -78,8 +78,13 @@ class ModelExtensionPaymentTwispay extends Model
             unset($data['timestamp']);
         }
 
-        if(!empty($data['identifier'])) {
-            $data['identifier'] = (int)str_replace('_', '', $data['identifier']);
+        /** Keep just the customer id from identifier */
+        if (!empty($data['identifier']) && strpos($data['identifier'], '_') !== false) {
+           $explodedVal = explode("_", $data['identifier'])[2];
+           /** Check if customer id contains only digits and is not empty */
+           if(!empty($explodedVal) && ctype_digit($explodedVal)){
+             $data['identifier'] = $explodedVal;
+           }
         }
 
         $query = "INSERT INTO `" . DB_PREFIX . "twispay_transactions` SET ";

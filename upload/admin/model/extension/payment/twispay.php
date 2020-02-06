@@ -1,7 +1,7 @@
 <?php
 /**
  * @author   Twistpay
- * @version  1.0.0
+ * @version  1.0.1
  */
 
 class ModelExtensionPaymentTwispay extends Model
@@ -28,7 +28,7 @@ class ModelExtensionPaymentTwispay extends Model
           ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
         return $this->db->query($sql);
     }
-
+ 
     public function deleteTransactionTable()
     {
         $this->db->query("DROP TABLE IF EXISTS `". DB_PREFIX ."twispay_transactions`");

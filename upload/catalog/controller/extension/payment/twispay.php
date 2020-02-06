@@ -75,7 +75,7 @@ class ControllerExtensionPaymentTwispay extends Controller
 
         if ($order_info) {
             /* Extract the customer details. */
-            $customer = [ 'identifier' => (0 == $order_info['customer_id']) ? ('_' . $order_id . '_' . date('YmdHis')) : ('_' . $order_info['customer_id'] . '_' . date('YmdHis'))
+            $customer = [ 'identifier' => (0 == $order_info['customer_id']) ? ('p_o2_' . $order_id . '_' . date('YmdHis')) : ('p_o2_' . $order_info['customer_id'] . '_' . date('YmdHis'))
                         , 'firstName' => ($order_info['payment_firstname']) ? ($order_info['payment_firstname']) : ($order_info['shipping_firstname'])
                         , 'lastName' => ($order_info['payment_lastname']) ? ($order_info['payment_lastname']) : ($order_info['shipping_lastname'])
                         , 'country' => ($order_info['payment_iso_code_2']) ? ($order_info['payment_iso_code_2']) : ($order_info['shipping_iso_code_2'])
@@ -116,8 +116,6 @@ class ControllerExtensionPaymentTwispay extends Controller
                      , 'backUrl' => $backUrl
                      /* , 'customData' => [] */
             ];
-
-            $this->_log(json_encode($orderData));
 
             $base64JsonRequest = Twispay_TW_Helper_Notify::getBase64JsonRequest($orderData);
             $base64Checksum = Twispay_TW_Helper_Notify::getBase64Checksum($orderData, $this->secretKey);
