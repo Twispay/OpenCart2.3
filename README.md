@@ -39,7 +39,7 @@ Install
 2. Use the Opencart 2 Extension Installer and upload the module archive.
 
 ### Manually
-1. Download the Twispay payment module from our [The Official Twispay Payment Gateway Extension](https://www.opencart.com/index.php?route=marketplace/extension/info&extension_id=31761&filter_member=twispay) or from our[Github repository](https://github.com/Twispay/OpenCart2.3).
+1. Download the Twispay payment module from our [The Official Twispay Payment Gateway Extension](https://www.opencart.com/index.php?route=marketplace/extension/info&extension_id=31761&filter_member=twispay) or from our [Github repository](https://github.com/Twispay/OpenCart2.3).
 
 2. Unzip the archive and upload the content of folder “uploads” (from inside the archive) inside the root directory of your opencart 2 store from the server.
 
