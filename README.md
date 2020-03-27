@@ -9,6 +9,8 @@ Twispay enables new and existing store owners to quickly and effortlessly accept
 
 == Description ==
 
+***Note** :  In case you encounter any difficulties with integration, please contact us at support@twispay.com and we'll assist you through the process.*
+
 Credit Card Payments by Twispay is the official payment module for OpenCart which allows for a quick and easy integration to Twispay’s Payment Gateway for accepting online credit card payments through a secure environment and a fully customisable checkout process. Give your customers the shopping experience they expect, and boost your online sales with our simple and elegant payment plugin.
 
 [Twispay](https://www.twispay.com) is a European certified acquiring bank with a sleek payment gateway optimized for online shops. We process payments from worldwide customers using Mastercard or Visa debit and credit cards. Increase your purchases by using our conversion rate optimized checkout flow and manage your transactions with our dashboard created specifically for online merchants like you.
@@ -26,7 +28,7 @@ All payments will be processed in a secure PCI DSS compliant environment so you 
 == Installation ==
 
 The easiest way of installing our module is by visiting the [official OpenCart marketplace page](https://www.opencart.com/index.php?route=marketplace/extension) and search for "twispay".
-Alternatively, you can check out our [installation guide](https://cdn2.hubspot.net/hubfs/2889476/Files/Dev/PaymentModules/OpenCart/_openCartGuide-1.pdf) for detailed step by step instructions.
+<!-- Alternatively, you can check out our [installation guide](https://cdn2.hubspot.net/hubfs/2889476/Files/Dev/PaymentModules/OpenCart/_openCartGuide-1.pdf) for detailed step by step instructions. -->
 
 Install
 =======
