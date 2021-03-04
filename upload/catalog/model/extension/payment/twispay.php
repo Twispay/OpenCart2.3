@@ -88,11 +88,16 @@ class ModelExtensionPaymentTwispay extends Model
         }
 
         $query = "INSERT INTO `" . DB_PREFIX . "twispay_transactions` SET ";
+        
+        // transaction kind does not exist anymore and is renamed to transactionMethod
         foreach($data as $key => $value) {
-            if(!in_array($key, $columns)) {
+            if(!in_array($key, $columns) && $key != 'transactionMethod') {
                 unset($data[$key]);
             } else {
                 $db_value = $this->db->escape($value);
+                if ($key == 'transactionMethod') {
+                    $key = 'transactionKind'; 
+                }
                 $query .= $key."="."'" . $db_value . "',";
             }
         }

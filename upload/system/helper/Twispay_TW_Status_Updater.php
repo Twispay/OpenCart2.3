@@ -47,7 +47,7 @@ if (! class_exists('Twispay_TW_Status_Updater')) :
             $order = $that->model_checkout_order->getOrder($orderId);
 
             /* Extract the status received from server. */
-            $serverStatus = (empty($decrypted['status'])) ? ($decrypted['transactionStatus']) : ($decrypted['status']);
+            $serverStatus = $decrypted['transactionStatus'];
 
             switch ($serverStatus) {
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['COMPLETE_FAIL']:
@@ -105,7 +105,7 @@ if (! class_exists('Twispay_TW_Status_Updater')) :
             $order = $that->model_checkout_order->getOrder($orderId);
 
             /* Extract the status received from server. */
-            $serverStatus = (empty($decrypted['status'])) ? ($decrypted['transactionStatus']) : ($decrypted['status']);
+            $serverStatus = $decrypted['transactionStatus'];
 
             switch ($serverStatus) {
                 case Twispay_TW_Status_Updater::$RESULT_STATUSES['COMPLETE_FAIL']:
